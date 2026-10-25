@@ -1,0 +1,16 @@
+{
+  "name": "Cleaning & Passivation Field Log",
+  "short_name": "Cleaning Log",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#edf3f7",
+  "theme_color": "#102d40",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

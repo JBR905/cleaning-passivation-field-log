@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#102d40"><meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Cleaning Log"><link rel="manifest" href="manifest.webmanifest">
+<title>Cleaning & Passivation Field Log</title>
+<style>
+:root{font:16px system-ui,-apple-system,sans-serif;color:#182b3a;background:#edf3f7}*{box-sizing:border-box}body{margin:0}
+header{background:#102d40;color:#fff;padding:20px 16px}header h1{font-size:21px;margin:0}header p{font-size:13px;color:#c5d9e4;margin:5px 0 0}
+main{max-width:790px;margin:auto;padding:12px 12px 70px}.tabs{display:flex;gap:7px;margin:0 0 13px}.tabs button{flex:1}
+.panel{background:#fff;border-radius:13px;padding:16px;margin-bottom:12px;box-shadow:0 2px 9px #102d4011}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:16px;margin:0 0 9px}.muted{color:#617383;font-size:13px}
+label{display:block;font-size:13px;font-weight:650;margin-bottom:5px}input,select,textarea{width:100%;font:inherit;padding:11px 10px;border:1px solid #bac8d2;border-radius:9px;background:#fff;color:#182b3a;min-width:0}
+input:focus,textarea:focus{outline:2px solid #2474a8;outline-offset:1px}textarea{min-height:75px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.field{min-width:0}.full{grid-column:1/-1}
+button{font:inherit;border:0;border-radius:9px;padding:11px 13px;background:#e5edf3;color:#163a52;font-weight:700;cursor:pointer}
+button.primary{background:#12699b;color:#fff}button.danger{background:#fce5e5;color:#9b2525}button.small{padding:7px 9px;font-size:13px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.actions>*{flex:1}.stage{border-left:4px solid #297b9e}
+.status{display:inline-block;border-radius:7px;padding:4px 7px;font-size:12px;font-weight:750}
+.ok{background:#e2f4e9;color:#176338}.bad{background:#ffe8e8;color:#9c2020}.pending{background:#eaf0f5;color:#556777}
+.note{background:#f3f7fa;padding:11px;border-radius:9px;font-size:13px;line-height:1.5}
+.record{border:1px solid #d9e2e9;border-radius:10px;padding:12px;margin-bottom:10px}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{text-align:left;border-bottom:1px solid #e5edf2;padding:8px 5px;vertical-align:top}
+.hidden{display:none!important}.row{display:flex;gap:8px;align-items:center}.row input{flex:1}.times{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.timebox{background:#f1f6f9;padding:10px;border-radius:10px}.timebox strong{font-size:20px}
+hr{border:0;border-top:1px solid #e0e9ee;margin:14px 0}.pill{font-size:12px;background:#e9f2f8;padding:5px 9px;border-radius:20px}
+@media(max-width:380px){.grid{grid-template-columns:1fr}.times{grid-template-columns:1fr}}
+@media print{header,.tabs,button,#editor,#history,#settings{display:none!important}body{background:#fff}main{padding:0}.panel{box-shadow:none;border:0}#review{display:block!important}}
+</style></head><body>
+<header><h1>Cleaning & Passivation Field Log</h1><p>Actual field readings • AM/PM times • Handwritten report reference</p></header>
+<main>
+<div class="tabs"><button onclick="tab('editor')">New / Edit</button><button onclick="tab('history')">History</button><button onclick="tab('settings')">Backup</button></div>
+<section id="editor">
+<div class="panel"><h2>Cleaning Cycle</h2><div class="grid">
+<div class="field"><label>Test date (MM/DD/YYYY)</label><input id="date" placeholder="MM/DD/YYYY" inputmode="numeric" maxlength="10"></div>
+<div class="field"><label>Record status</label><select id="reportStatus"><option>Awaiting handwritten report</option><option>Transferred to paper</option></select></div>
+<div class="field full"><label>Shared work order (optional, if all pipes use one)</label><input id="wo" placeholder="Leave blank if pipes have separate work orders"></div>
+<div class="field full"><label>Pipe / line item IDs (one per line; optional work order after | )</label>
+<textarea id="pipes" placeholder="LNG-101&#10;LNG-102 | WO-1234"></textarea><div class="muted">Enter each pipe on its own line. Add its work order after | when different. Example: PIPE-100 | WO-456. Leave pending work orders blank and add later. All listed pipes share the same cleaning cycle.</div></div>
+</div><div class="note" style="margin-top:12px">Chemical quantities are totals for this entire connected cleaning cycle, not per pipe. Record them once, even when several work orders are involved.</div></div>
+<div class="panel stage"><h2>1. Initial DI Water — Baseline</h2><div class="grid">
+<div class="field"><label>pH (5.0–8.0)</label><input id="initialPh" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label>Conductivity (µS/cm, ≤ 5.0)</label><input id="initialCond" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label>Resistivity (MΩ, ≥ 0.2)</label><input id="initialRes" type="number" step="any" inputmode="decimal"></div>
+</div><div id="initialCheck" class="note" style="margin-top:12px">Enter actual measurements.</div></div>
+<div class="panel stage"><h2>2. Brulin Cleaning</h2><div class="grid">
+<div class="field"><label>pH (9.0–10.5)</label><input id="brulinPh" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label>Brulin added (gallons)</label><input id="brulinGallons" type="number" min="0" step="any" inputmode="decimal"></div>
+<div class="field"><label>Temperature (°F, 135–155)</label><input id="brulinTemp" type="number" step="any" inputmode="decimal"></div>
+</div><div id="brulinTime"></div><div id="brulinCheck" class="note">Enter actual measurements.</div></div>
+<div class="panel stage"><h2>3. Intermediate DI Rinse</h2><label>Optional rinse notes / measurements</label><textarea id="rinseNotes" placeholder="Rinse notes or measured readings"></textarea></div>
+<div class="panel stage"><h2>4. Citric Acid Passivation</h2><div class="grid">
+<div class="field"><label>pH (1.8–2.2)</label><input id="citricPh" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label>Citric acid added (pounds)</label><input id="citricPounds" type="number" min="0" step="any" inputmode="decimal"></div>
+<div class="field"><label>Concentration (%, 4–10)</label><input id="citricConc" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label>Temperature (°F, 135–155)</label><input id="citricTemp" type="number" step="any" inputmode="decimal"></div>
+</div><div id="citricTime"></div><div id="citricCheck" class="note">Enter actual measurements.</div></div>
+<div class="panel stage"><h2>5. Final DI Rinse</h2><div class="grid">
+<div class="field"><label>pH (5.0–8.0)</label><input id="finalPh" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label>Conductivity (µS/cm, ≤ 5.0)</label><input id="finalCond" type="number" step="any" inputmode="decimal"></div>
+<div class="field"><label>Resistivity (MΩ, ≥ 0.2)</label><input id="finalRes" type="number" step="any" inputmode="decimal"></div>
+</div><div id="finalCheck" class="note" style="margin-top:12px">Initial pH comparison will appear here.</div></div>
+<div class="panel"><h2>Field Notes</h2><textarea id="notes" placeholder="Observations, unusual conditions, retests, specification references, etc."></textarea>
+<div class="note" style="margin-top:10px">This is a field notes tool, not a certification or automatic pass/fail determination. Keep measured values as observed and follow the applicable work order and approved procedure.</div>
+<div class="actions"><button class="primary" onclick="save()">Save Record</button><button onclick="tab('review');renderReview(draft())">Review Notes</button></div>
+<div class="actions"><button onclick="newRecord()">New Blank Record</button></div><div id="saveMsg" class="muted"></div></div>
+</section>
+<section id="history" class="hidden"><div class="panel"><h2>Saved Records</h2><input id="search" placeholder="Search date, pipe, work order, notes…" oninput="renderHistory()"><div id="historyList" style="margin-top:12px"></div></div></section>
+<section id="review" class="hidden"><div class="panel"><div class="actions" style="margin-top:0"><button onclick="tab('history')">Back to History</button><button onclick="window.print()">Print Reference</button></div><div id="reviewBody"></div></div></section>
+<section id="settings" class="hidden"><div class="panel"><h2>Backup & Restore</h2>
+<p class="muted">Records stay on this device/browser, not on GitHub. Export JSON regularly and save it somewhere safe. Removing browser data can erase local records.</p>
+<div class="actions"><button class="primary" onclick="exportJSON()">Export JSON Backup</button><button onclick="exportCSV()">Export CSV</button></div>
+<hr><label>Restore JSON backup (merges by record ID)</label><input type="file" id="restore" accept=".json,application/json" onchange="restoreBackup(event)">
+<p class="muted">Offline support works after the deployed site has loaded successfully once. A local HTML file may not support the offline service worker.</p>
+</div></section>
+</main>
+<script>
+const KEY='cleaning-passivation-records-v1',DRAFT='cleaning-passivation-draft-v1';
+const ids=['date','reportStatus','wo','pipes','initialPh','initialCond','initialRes','brulinPh','brulinGallons','brulinTemp','rinseNotes','citricPh','citricPounds','citricConc','citricTemp','finalPh','finalCond','finalRes','notes'];
+let editing=null,restoring=false;
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const today=()=>{let d=new Date();return `${pad(d.getMonth()+1)}/${pad(d.getDate())}/${d.getFullYear()}`};
+const parseDate=s=>{let m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s.trim());if(!m)return null;let d=new Date(+m[3],+m[1]-1,+m[2]);return d.getFullYear()===+m[3]&&d.getMonth()===+m[1]-1&&d.getDate()===+m[2]?d:null};
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||[]}catch{return []}};
+const val=id=>$(id).value.trim();
+const num=id=>val(id)===''?null:Number(val(id));
+const fmtNum=v=>v===null||v===''?'—':String(v);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const status=(v,lo,hi)=>v===null?'<span class="status pending">Not entered</span>':v>=lo&&v<=hi?'<span class="status ok">Within stated limit</span>':'<span class="status bad">Outside stated limit</span>';
+function tab(name){['editor','history','review','settings'].forEach(x=>$(x).classList.toggle('hidden',x!==name));if(name==='history')renderHistory();window.scrollTo(0,0)}
+function timeMarkup(k,defaultMin){
+return `<hr><div class="grid"><div class="field"><label>Required run (minutes)</label><input type="number" step="1" min="0" id="${k}Required" value="${defaultMin}" inputmode="numeric"></div><div class="field"><label>Required decimal hours</label><div class="note" id="${k}RequiredDecimal">—</div></div></div>
+<div class="times" style="margin-top:12px"><div class="timebox"><label>Start (AM/PM)</label><input id="${k}Start" placeholder="1:30 PM" inputmode="text"><button class="small" style="margin-top:8px" onclick="stamp('${k}Start')">Use Current Time</button></div>
+<div class="timebox"><label>Finish (AM/PM)</label><input id="${k}End" placeholder="2:00 PM" inputmode="text"><button class="small" style="margin-top:8px" onclick="stamp('${k}End')">Use Current Time</button></div></div>
+<div class="note" style="margin:12px 0" id="${k}Timing">Enter a start time. Times must include AM or PM.</div>`;
+}
+$('brulinTime').innerHTML=timeMarkup('brulin',30);$('citricTime').innerHTML=timeMarkup('citric',15);
+const timeIds=['brulinRequired','brulinStart','brulinEnd','citricRequired','citricStart','citricEnd'];
+function parseTime(s){let m=/^(\d{1,2}):([0-5]\d)\s*(AM|PM)$/i.exec(s.trim());if(!m||+m[1]<1||+m[1]>12)return null;return (+m[1]%12+(m[3].toUpperCase()==='PM'?12:0))*60+(+m[2])}
+function showTime(minutes){minutes=((minutes%1440)+1440)%1440;let h=Math.floor(minutes/60),m=minutes%60;return `${h%12||12}:${pad(m)} ${h>=12?'PM':'AM'}`}
+function stamp(id){let d=new Date();$(id).value=showTime(d.getHours()*60+d.getMinutes());changed()}
+function decimal(m){return (m/60).toFixed(4).replace(/0+$/,'').replace(/\.$/,'')}
+function timing(k){
+let req=val(k+'Required'),start=parseTime(val(k+'Start')),end=parseTime(val(k+'End'));
+$(k+'RequiredDecimal').textContent=req!==''&&Number(req)>=0?decimal(Number(req))+' hr':'—';
+let msg=[];
+if(start!==null&&req!==''&&Number(req)>=0)msg.push('Expected finish: '+showTime(start+Number(req)));
+if(start!==null&&end!==null){let elapsed=(end-start+1440)%1440;msg.push('Recorded elapsed: '+elapsed+' min = '+decimal(elapsed)+' hr');if(req!==''&&elapsed<Number(req))msg.push('⚠ Recorded time is shorter than required');}
+else if(val(k+'Start')||val(k+'End'))msg.push('Enter both times as h:mm AM/PM');
+$(k+'Timing').textContent=msg.join(' • ')||'Enter start and finish times in AM/PM format.';
+}
+function check(){
+$('initialCheck').innerHTML=`pH ${status(num('initialPh'),5,8)}<br>Conductivity ${status(num('initialCond'),0,5)}<br>Resistivity ${status(num('initialRes'),.2,Infinity)}`;
+$('brulinCheck').innerHTML=`pH ${status(num('brulinPh'),9,10.5)}<br>Temperature ${status(num('brulinTemp'),135,155)}`;
+$('citricCheck').innerHTML=`pH ${status(num('citricPh'),1.8,2.2)}<br>Concentration ${status(num('citricConc'),4,10)}<br>Temperature ${status(num('citricTemp'),135,155)}`;
+let a=num('initialPh'),b=num('finalPh');
+let comparison=a===null||b===null?'Enter initial and final pH to compare.':`Initial pH ${a}; final pH ${b}; difference ${(b-a).toFixed(2)}. ${b>a?'Final is higher than initial.':b<a?'Final is lower than initial.':'Values are equal.'} This comparison is informational, not proof of chemical removal.`;
+$('finalCheck').innerHTML=`pH ${status(b,5,8)}<br>Conductivity ${status(num('finalCond'),0,5)}<br>Resistivity ${status(num('finalRes'),.2,Infinity)}<br>${esc(comparison)}`;
+timing('brulin');timing('citric');
+}
+function draft(){let d={id:editing||('rec-'+Date.now()+'-'+Math.random().toString(36).slice(2,8)),updated:new Date().toISOString()};[...ids,...timeIds].forEach(id=>d[id]=val(id));return d}
+function changed(){check();try{localStorage.setItem(DRAFT,JSON.stringify(draft()))}catch{$('saveMsg').textContent='Storage unavailable. Export or copy notes before leaving.'}}
+[...ids,...timeIds].forEach(id=>$(id).addEventListener('input',changed));
+function newRecord(){if(!confirm('Start a new blank record? Save the current one first if needed.'))return;editing=null;[...ids,...timeIds].forEach(id=>$(id).value='');$('date').value=today();$('reportStatus').value='Awaiting handwritten report';$('brulinRequired').value='30';$('citricRequired').value='15';changed();tab('editor')}
+function save(){if(!parseDate(val('date'))){alert('Enter a valid date as MM/DD/YYYY.');$('date').focus();return}
+for(let k of ['brulin','citric']){let req=val(k+'Required');if(req!==''&&(!Number.isFinite(Number(req))||Number(req)<0)){alert('Invalid required run time.');return}
+for(let f of ['Start','End'])if(val(k+f)&&parseTime(val(k+f))===null){alert('Use AM/PM time such as 1:30 PM.');$(k+f).focus();return}}
+let d=draft(),all=load();all=all.filter(r=>r.id!==d.id);all.unshift(d);
+try{localStorage.setItem(KEY,JSON.stringify(all));editing=d.id;localStorage.removeItem(DRAFT);$('saveMsg').textContent='Saved locally at '+new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});}catch(e){alert('Could not save: local storage may be full or disabled.');}}
+function edit(id){let d=load().find(r=>r.id===id);if(!d)return;editing=id;[...ids,...timeIds].forEach(x=>$(x).value=d[x]??'');changed();tab('editor')}
+function del(id){if(!confirm('Delete this saved record permanently?'))return;localStorage.setItem(KEY,JSON.stringify(load().filter(r=>r.id!==id)));renderHistory()}
+function renderHistory(){let q=val('search').toLowerCase(),items=load().filter(d=>JSON.stringify(d).toLowerCase().includes(q));$('historyList').innerHTML=items.length?items.map(d=>`<div class="record"><b>${esc(d.date)} — ${esc(d.wo||'Multiple / pending work orders')}</b><div class="muted">${esc((d.pipes||'').split('\n').filter(Boolean).join(', ')||'No pipe IDs entered')}<br>${esc(d.reportStatus||'')}</div><div class="actions"><button class="small" onclick="openReview('${d.id}')">Review</button><button class="small" onclick="edit('${d.id}')">Edit</button><button class="small danger" onclick="del('${d.id}')">Delete</button></div></div>`).join(''):'<p class="muted">No matching records yet.</p>'}
+function openReview(id){let d=load().find(r=>r.id===id);if(d){renderReview(d);tab('review')}}
+function detail(d,k,unit=''){return esc(d[k]||'—')+(d[k]?unit:'')}
+function timeDetail(d,k){let a=parseTime(d[k+'Start']||''),b=parseTime(d[k+'End']||'');let dur=a!==null&&b!==null?(b-a+1440)%1440:null;return `<p><b>Required:</b> ${detail(d,k+'Required',' min')} (${d[k+'Required']!==''?decimal(Number(d[k+'Required'])):'—'} hr)<br><b>Start:</b> ${detail(d,k+'Start')}<br><b>Finish:</b> ${detail(d,k+'End')}<br><b>Actual elapsed:</b> ${dur===null?'—':dur+' min / '+decimal(dur)+' hr'}</p>`}
+function renderReview(d){
+$('reviewBody').innerHTML=`<h2 style="margin-top:15px">Cleaning & Passivation Notes</h2><p><b>Date:</b> ${esc(d.date)}<br><b>Work order:</b> ${esc(d.wo||'Pending')}<br><b>Report:</b> ${esc(d.reportStatus||'')}</p>
+<h3>Connected pipes / work orders</h3><p style="white-space:pre-wrap">${esc(d.pipes||'—')}</p><p class="muted">All listed pipes share the same recorded cycle. Chemical quantities below are for the whole cycle, not each pipe.</p><hr>
+<h3>1. Initial DI Water</h3><p>pH: <b>${detail(d,'initialPh')}</b><br>Conductivity: <b>${detail(d,'initialCond',' µS/cm')}</b><br>Resistivity: <b>${detail(d,'initialRes',' MΩ')}</b></p><hr>
+<h3>2. Brulin Cleaning</h3><p>pH: <b>${detail(d,'brulinPh')}</b><br>Brulin added (total for cycle): <b>${detail(d,'brulinGallons',' gallons')}</b><br>Temperature: <b>${detail(d,'brulinTemp',' °F')}</b></p>${timeDetail(d,'brulin')}<hr>
+<h3>3. Intermediate DI Rinse</h3><p style="white-space:pre-wrap">${esc(d.rinseNotes||'—')}</p><hr>
+<h3>4. Citric Acid Passivation</h3><p>pH: <b>${detail(d,'citricPh')}</b><br>Citric acid added (total for cycle): <b>${detail(d,'citricPounds',' lb')}</b><br>Concentration: <b>${detail(d,'citricConc','%')}</b><br>Temperature: <b>${detail(d,'citricTemp',' °F')}</b></p>${timeDetail(d,'citric')}<hr>
+<h3>5. Final DI Rinse</h3><p>pH: <b>${detail(d,'finalPh')}</b><br>Conductivity: <b>${detail(d,'finalCond',' µS/cm')}</b><br>Resistivity: <b>${detail(d,'finalRes',' MΩ')}</b><br>Initial pH baseline: <b>${detail(d,'initialPh')}</b></p><hr>
+<h3>Notes</h3><p style="white-space:pre-wrap">${esc(d.notes||'—')}</p><p class="muted">Field notes only. Verify against approved specifications and official test documentation.</p>`}
+function download(name,content,type){let a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000)}
+function exportJSON(){download('cleaning-passivation-backup-'+today().replaceAll('/','-')+'.json',JSON.stringify({app:'CleaningPassivationFieldLog',version:1,records:load()},null,2),'application/json')}
+function exportCSV(){let cols=['date','wo','pipes','reportStatus','initialPh','initialCond','initialRes','brulinPh','brulinGallons','brulinTemp',...timeIds.slice(0,3),'rinseNotes','citricPh','citricPounds','citricConc','citricTemp',...timeIds.slice(3),'finalPh','finalCond','finalRes','notes'];let quote=s=>'"'+String(s??'').replace(/"/g,'""')+'"';download('cleaning-passivation-records.csv',[cols.map(quote).join(','),...load().map(d=>cols.map(c=>quote(d[c])).join(','))].join('\r\n'),'text/csv')}
+async function restoreBackup(e){let f=e.target.files[0];if(!f)return;try{let obj=JSON.parse(await f.text());if(obj.app!=='CleaningPassivationFieldLog'||!Array.isArray(obj.records))throw Error('Not a compatible backup');let map=new Map(load().map(r=>[r.id,r]));for(let r of obj.records){if(!r||typeof r.id!=='string'||!parseDate(String(r.date||'')))throw Error('Invalid record');map.set(r.id,r)}localStorage.setItem(KEY,JSON.stringify([...map.values()]));alert('Backup restored. '+obj.records.length+' record(s) imported.')}catch(err){alert('Restore failed: '+err.message)}e.target.value=''}
+try{let saved=JSON.parse(localStorage.getItem(DRAFT));if(saved){editing=saved.id;[...ids,...timeIds].forEach(id=>$(id).value=saved[id]??'')}else $('date').value=today()}catch{$('date').value=today()}
+check();if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script></body></html>
